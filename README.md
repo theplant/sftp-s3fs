@@ -3,7 +3,7 @@
 - [`debian-jessie`, `debian`, `latest` (*Dockerfile*)](https://github.com/atmoz/sftp/blob/master/Dockerfile) [![](https://images.microbadger.com/badges/image/atmoz/sftp.svg)](http://microbadger.com/images/atmoz/sftp "Get your own image badge on microbadger.com")
 - [`alpine-3.4`, `alpine` (*Dockerfile*)](https://github.com/atmoz/sftp/blob/alpine/Dockerfile) [![](https://images.microbadger.com/badges/image/atmoz/sftp:alpine.svg)](http://microbadger.com/images/atmoz/sftp "Get your own image badge on microbadger.com")
 
-# Securely share your files
+# Securely share your files with S3 filesystem baked-in with s3fs_fuse
 
 Easy to use SFTP ([SSH File Transfer Protocol](https://en.wikipedia.org/wiki/SSH_File_Transfer_Protocol)) server with [OpenSSH](https://en.wikipedia.org/wiki/OpenSSH).
 This is an automated build linked with the [debian](https://hub.docker.com/_/debian/) and [alpine](https://hub.docker.com/_/alpine/) repositories.
@@ -18,10 +18,13 @@ This is an automated build linked with the [debian](https://hub.docker.com/_/deb
     ownership. Perfect when you just want a fast way to upload something without
     mounting any directories, or you want to make sure a directory is owned by
     a user (chown -R).
-- Mount volumes in user's home directory.
+- Mount volumes in user's home directory. Not supported with s3fs_fuse addition
   - The users are chrooted to their home directory, so you must mount the
     volumes in separate directories inside the user's home directory
     (/home/user/**mounted-directory**).
+- s3fs is currently only supported with a single user-dir. 
+  Adding additional mounts for multiple users should be simple, but not in my original use-case.
+  last-in wins currently
 
 # Examples
 
@@ -29,41 +32,35 @@ This is an automated build linked with the [debian](https://hub.docker.com/_/deb
 ## Simplest docker run example
 
 ```
-docker run -p 22:22 -d atmoz/sftp foo:pass:::upload
-```
-
-User "foo" with password "pass" can login with sftp and upload files to a folder called "upload". No mounted directories or custom UID/GID. Later you can inspect the files and use `--volumes-from` to mount them somewhere else (or see next example).
-
-## Sharing a directory from your computer
-
-Let's mount a directory and set UID:
+docker run -e bucket_name=S3_BUCKET_NAME[:/OPTIONAL_SUBDIR] -e ami_id=REPLACE_WITH_AMI_ID -e ami_secret=REPLACE_WITH_AMI_SECRET --security-opt apparmor:unconfined --cap-add mknod --cap-add sys_admin --device=/dev/fuse -p 21:22 -d chessracer/sftp-s3fs testuser:password:1000:1000:user_subdir
 
 ```
-docker run \
-    -v /host/share:/home/foo/share \
-    -p 2222:22 -d atmoz/sftp \
-    foo:123:1001
+User "testuser" with password "testpass" can login with sftp and upload files to a folder called "s3_bucket". Files uploaded this way are synced to S3 with the named S3_BUCKET_NAME.
+The provide ami_id and ami_secret must have roles to write to that s3 bucket
+
+## Example to connect to a locally-running instance on the default docker IP:
+```
+sftp -P 21 testuser@172.17.0.1:user_subdir
+sftp> put somefile
+sftp> ls
+somefile
 ```
 
 ### Using Docker Compose:
 
 ```
-sftp:
-    image: atmoz/sftp
-    volumes:
-        - /host/share:/home/foo/share
-    ports:
-        - "2222:22"
-    command: foo:123:1001
+TODO
 ```
 
-### Logging in
+## Example Login: connect to a locally-running instance on the default docker IP:
+```
+sftp -P 21 testuser@172.17.0.1:user_subdir
+sftp> put somefile
+sftp> ls
+somefile
+```
 
-The OpenSSH server runs by default on port 22, and in this example, we are
-forwarding the container's port 22 to the host's port 2222. To log in with the
-OpenSSH client, run: `sftp -P 2222 foo@<host-ip>`
-
-## Store users in config
+## Store users in config - NOTE: Multiple users not yet supported for s3fs (last-in wins for s3fs mount)
 
 ```
 docker run \

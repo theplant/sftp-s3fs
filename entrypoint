@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -x
 export DEBIAN_FRONTEND=noninteractive
 
 userConfPath="/etc/sftp-users.conf"
@@ -150,9 +149,8 @@ if [ -d /etc/sftp.d ]; then
 fi
 
 #s3fs_fuse filesystem - only supported in single-user + dir scenario
-#fixme - on POC, need to update to allow named bucket
-echo $ami_id:$ami_secret > /root/.s3fs && chmod 400 /root/.s3fs
-eval /usr/bin/s3fs -o allow_other -o use_cache=/tmp -o passwd_file=/root/.s3fs -o endpoint=us-west-2 $bucket_name $dirPath 
+
+eval /usr/bin/s3fs -o allow_other -o use_cache=/tmp -o endpoint=us-west-2 $S3_BUCKET_NAME $dirPath 
 
 echo "DEBUG: finished running s3fs"
 

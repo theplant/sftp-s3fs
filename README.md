@@ -32,29 +32,22 @@ This is an automated build linked with the [debian](https://hub.docker.com/_/deb
 ## Simplest docker run example
 
 ```
-docker run -e bucket_name=S3_BUCKET_NAME[:/OPTIONAL_SUBDIR] -e ami_id=REPLACE_WITH_AMI_ID -e ami_secret=REPLACE_WITH_AMI_SECRET --security-opt apparmor:unconfined --cap-add mknod --cap-add sys_admin --device=/dev/fuse -p 21:22 -d chessracer/sftp-s3fs testuser:password:1000:1000:user_subdir
+docker run -e S3_BUCKET_NAME=yourbucket[:/OPTIONAL_SUBDIR] -e AWSACCESSKEYID=your_aws_access_key_id -e AWSSECRETACCESSKEY=your_aws_secret_key --security-opt apparmor:unconfined --cap-add mknod --cap-add sys_admin --device=/dev/fuse -p 21:22 -d chessracer/sftp-s3fs testuser:pass:::sync_to_s3
 
 ```
-User "testuser" with password "testpass" can login with sftp and upload files to a folder called "s3_bucket". Files uploaded this way are synced to S3 with the named S3_BUCKET_NAME.
-The provide ami_id and ami_secret must have roles to write to that s3 bucket
-
-## Example to connect to a locally-running instance on the default docker IP:
-```
-sftp -P 21 testuser@172.17.0.1:user_subdir
-sftp> put somefile
-sftp> ls
-somefile
-```
+User "testuser" with password "pass" can login with sftp and upload files to a folder in that container at /home/testuser/sync_to_s3. Files uploaded this way are synced to S3 in the named S3_BUCKET_NAME.
+The provided AWSACCESSKEYID must be associated with a role that has access permissions to the S3 bucket. 
 
 ### Using Docker Compose:
+Run the provided docker-compose.yml file, providing values in the environment for for AWSACCESSKEYID, AWSSECRETACCESSKEY, S3_BUCKET_NAME, USERNAME, and PASSWORD. eg:
 
 ```
-TODO
+AWSACCESSKEYID=your_aws_access_key_id AWSSECRETACCESSKEY=your_aws_secret_key S3_BUCKET_NAME=your_bucket_name USERNAME=testuser PASSWORD=pass docker-compose up -d
 ```
 
 ## Example Login: connect to a locally-running instance on the default docker IP:
 ```
-sftp -P 21 testuser@172.17.0.1:user_subdir
+sftp -P 21 testuser@172.17.0.1:sync_to_s3
 sftp> put somefile
 sftp> ls
 somefile

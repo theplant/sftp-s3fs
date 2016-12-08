@@ -1,0 +1,16 @@
+sftp_s3s:
+  image: chessracer/sftp-s3fs:latest
+  ports:
+   - "21:22"
+  environment:
+    AWSACCESSKEYID: ${AWSACCESSKEYID}
+    AWSSECRETACCESSKEY: ${AWSSECRETACCESSKEY}
+    S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+  cap_add:
+   - MKNOD
+   - SYS_ADMIN
+  security_opt:
+   - apparmor:unconfined
+  devices:
+   - /dev/fuse
+  command: ${USERNAME}:${PASSWORD}:::sync_to_s3

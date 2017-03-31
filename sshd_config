@@ -14,9 +14,10 @@ PasswordAuthentication yes
 UseDNS no
 
 # Limited access
-PermitRootLogin no
+PermitRootLogin yes
 X11Forwarding no
 AllowTcpForwarding no
+UsePAM no
 
 # Force sftp and chroot jail
 Subsystem sftp internal-sftp

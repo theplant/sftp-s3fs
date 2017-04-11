@@ -154,4 +154,4 @@ eval /usr/bin/s3fs -o allow_other -o use_cache=/tmp -o endpoint=us-west-2 $S3_BU
 
 echo "DEBUG: finished running s3fs"
 
-exec /usr/sbin/sshd -D -e
+exec /usr/sbin/sshd -D -e -g 240

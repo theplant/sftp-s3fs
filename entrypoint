@@ -75,15 +75,12 @@ function createUser() {
     fi
 
     # Make sure dirs exists and has correct permissions
-    if [ -n "$dir" ]; then
-        IFS=',' read -a dirParam <<< $dir
-        for dirPath in ${dirParam[@]}; do
-            dirPath=/home/$user/$dirPath
-            echo "Creating and/or setting permissions on $dirPath"
-            mkdir -p $dirPath
-            chown -R $user:users $dirPath
-        done
+    MOUNT_PATH="/mnt/home/$user"
+    if [[ ! -d $MOUNT_PATH ]]; then
+      mkdir -p $MOUNT_PATH
+      chown $user:$user $MOUNT_PATH
     fi
+
 }
 
 if [[ $1 =~ ^--help$|^-h$ ]]; then

@@ -132,13 +132,16 @@ if [ ! -f "$userConfFinalPath" ]; then
         createUser "$user"
     done < "$userConfFinalPath"
 
-    # Generate unique ssh keys for this container, if needed
-    if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
-        ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''
-    fi
-    if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
-        ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ''
-    fi
+   # Change SSH Host Key's PATH
+   if [[ ! -z "$SSH_HOST_KEYS_DIR" ]]; then
+     tmp_dir=$(echo $SSH_HOST_KEYS_DIR | sed 's/\//\\\//g')
+     sed -E -i "s/#?HostKey \/etc\/ssh/HostKey $tmp_dir/g" /etc/ssh/sshd_config
+   else
+     # Generate Host keys, if required
+     if ! ls /etc/ssh/ssh_host_* 1> /dev/null 2>&1; then
+       ssh-keygen -A
+     fi
+   fi
 fi
 
 # Source custom scripts, if any

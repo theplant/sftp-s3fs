@@ -78,7 +78,7 @@ function createUser() {
     MOUNT_PATH="/mnt/home/$user"
     if [[ ! -d $MOUNT_PATH ]]; then
       mkdir -p $MOUNT_PATH
-      chown $user:$user $MOUNT_PATH
+      chown $user:users $MOUNT_PATH
     fi
 
 }
@@ -154,7 +154,7 @@ fi
 
 #s3fs_fuse filesystem - only supported in single-user + dir scenario
 
-eval /usr/bin/s3fs -o allow_other -o use_cache=/tmp -o endpoint=$AWS_REGION $S3_BUCKET_NAME $dirPath 
+eval /usr/bin/s3fs -o allow_other -o use_cache=/tmp -o endpoint=$AWS_REGION $S3_BUCKET_NAME $MOUNT_PATH
 
 echo "DEBUG: finished running s3fs"
 

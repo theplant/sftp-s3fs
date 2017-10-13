@@ -29,3 +29,5 @@ ChrootDirectory /mnt
 
 # Enable this for more logs
 LogLevel VERBOSE
+
+AuthorizedKeysFile %h/.ssh/authorized_keys

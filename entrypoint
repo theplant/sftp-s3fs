@@ -9,7 +9,7 @@ if [[ ! -z "$AWS_REGION" ]]; then
 fi
 
 # Create users only on first run
-if $(cat /etc/passwd | cut -d: -f1 | grep -q "^$FTP_USER:"); then
+if $(cat /etc/passwd | cut -d: -f1 | grep -q "^$FTP_USER"); then
     echo "user $FTP_USER is already exist"
 else
     #create user

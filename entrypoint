@@ -50,7 +50,7 @@ fi
 
 #s3fs_fuse filesystem - only supported in single-user + dir scenario
 
-eval /usr/bin/s3fs -o allow_other -o use_cache=/tmp -o endpoint=$AWS_REGION $S3_BUCKET_NAME /mnt/home/$FTP_USER
+eval /usr/bin/s3fs -o allow_other,uid=1000,gid=1000,umask=007 -o use_cache=/tmp -o endpoint=$AWS_REGION $S3_BUCKET_NAME /mnt/home/$FTP_USER
 
 echo "DEBUG: finished running s3fs"
 

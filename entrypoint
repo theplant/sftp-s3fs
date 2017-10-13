@@ -10,11 +10,12 @@ fi
 
 # Create users only on first run
 if $(cat /etc/passwd | cut -d: -f1 | grep -q "^$FTP_USER:"); then
-
+    echo "user $FTP_USER is already exist"
+else
     #create user
-    addgroup -g 1000 $FTP_USER
-    adduser -D -h /home/$FTP_USER -s /bin/bash -u 1000 -G $FTP_USER $FTP_USER
-    passwd -u $FTP_USER
+    groupadd -g 1000 $FTP_USER
+    useradd -m -s /bin/bash -u 1000 -g $FTP_USER $FTP_USER
+    usermod -p "*" $FTP_USER
 
     mkdir -p /home/$FTP_USER/.ssh
     chmod 700 /home/$FTP_USER/.ssh/
@@ -36,6 +37,8 @@ if $(cat /etc/passwd | cut -d: -f1 | grep -q "^$FTP_USER:"); then
         chown $FTP_USER /home/$FTP_USER/.ssh/authorized_keys
         chmod 600 /home/$FTP_USER/.ssh/authorized_keys
     fi
+
+    chown -R $FTP_USER:$FTP_USER /home/$FTP_USER/.ssh/
 
     # Make sure dirs exists and has correct permissions
     MOUNT_PATH="/mnt/home/$FTP_USER"

@@ -9,7 +9,7 @@ if [[ ! -z "$AWS_REGION" ]]; then
 fi
 
 # Create users only on first run
-if id $FTP_USER; then
+if $(cat /etc/passwd | cut -d: -f1 | grep -q "^$FTP_USER:"); then
 
     #create user
     addgroup -g 1000 $FTP_USER
@@ -41,13 +41,13 @@ if id $FTP_USER; then
     MOUNT_PATH="/mnt/home/$FTP_USER"
     if [[ ! -d $MOUNT_PATH ]]; then
       mkdir -p $MOUNT_PATH
-      chown $FTP_USER:users $MOUNT_PATH
+      chown $FTP_USER:$FTP_USER $MOUNT_PATH
     fi
 fi
 
 #s3fs_fuse filesystem - only supported in single-user + dir scenario
 
-eval /usr/bin/s3fs -o allow_other -o use_cache=/tmp -o endpoint=$AWS_REGION $S3_BUCKET_NAME $MOUNT_PATH
+eval /usr/bin/s3fs -o allow_other -o use_cache=/tmp -o endpoint=$AWS_REGION $S3_BUCKET_NAME /mnt/home/$FTP_USER
 
 echo "DEBUG: finished running s3fs"
 

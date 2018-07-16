@@ -31,6 +31,10 @@ else
       fi
     fi
 
+    if [ -f /root/authorized_keys ]; then
+        cp /root/authorized_keys /home/$FTP_USER/.ssh/authorized_keys
+    fi
+
     # Add SSH keys to authorized_keys with valid permissions
     if [ -d /home/$FTP_USER/.ssh/keys ]; then
         cat /home/$FTP_USER/.ssh/keys/* >> /home/$FTP_USER/.ssh/authorized_keys

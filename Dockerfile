@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:latest
 MAINTAINER Jonathan Baker [chessracer@gmail.com]
 
 # - Install packages

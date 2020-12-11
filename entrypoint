@@ -51,7 +51,7 @@ if [ -z "$AWS_REGION" ]; then
 fi
 
 # https://github.com/s3fs-fuse/s3fs-fuse/issues/742#issuecomment-381422814
-s3fs_options="-o url=https://s3-$AWS_REGION.amazonaws.com -o allow_other,uid=1000,gid=1000,umask=007 -o use_cache=/tmp -o endpoint=$AWS_REGION"
+s3fs_options="-o url=https://s3-$AWS_REGION.amazonaws.com -o allow_other,uid=1000,gid=1000,umask=007 -o endpoint=$AWS_REGION"
 
 if [ -z "$AWSACCESSKEYID" ]; then
   s3fs_options="-o iam_role=auto $s3fs_options"
